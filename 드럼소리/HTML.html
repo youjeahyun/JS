@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>사운드 테스트</title>
+  <style>
+    body {
+      text-align: center;
+      background: black;
+      background-size: 100%;
+      min-height: 100vh;
+    }
+
+    h1 {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background: white;
+      font-weight: 1300;
+      border-radius: 15px;
+    }
+
+    ul {
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      display: inline-block;
+      width: 5rem;
+      height: 5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #f3f3f3;
+      border-radius: 15px;
+      padding: 1rem;
+      transition: all 0.5s ease-in-out;
+      margin: 0.5rem 0.3rem;
+    }
+
+    li.playing {
+      transform: scale(0.8);
+      box-shadow: 0px 0px 10px 5px rgba(255, 255, 255, 1);
+    }
+
+    li img {
+      width: 110px;
+      border-radius: 50%;
+    }
+
+    li span {
+      color: white;
+      font-weight: 900;
+      font-size: 5rem;
+    }
+
+    p {
+      color: white;
+      font-weight: 900;
+      font-size: 2rem;
+    }
+  </style>
+
+</head>
+
+<body>
+  <section>
+    <h1>사운드 테스트</h1>
+    <ul>
+      <li data-key="65" class="key">
+        <span>A</span>
+      </li>
+      <li data-key="83" class="key">
+        <span>S</span>
+      </li>
+      <li data-key="68" class="key">
+        <span>D</span>
+      </li>
+      <li data-key="70" class="key">
+        <span>F</span>
+      </li>
+      <li data-key="71" class="key">
+        <span>G</span>
+      </li>
+      <li data-key="72" class="key">
+        <span>H</span>
+      </li>
+      <li data-key="74" class="key">
+        <span>J</span>
+      </li>
+      <li data-key="75" class="key">
+        <span>K</span>
+      </li>
+      <li data-key="76" class="key">
+        <span>L</span>
+      </li>
+      <li data-key="186" class="key">
+        <span>;</span>
+      </li>
+      <li data-key="222" class="key">
+        <span>'</span>
+      </li>
+    </ul>
+  </section>
+  <!--src를 #을 준이유는 공부하는사람이 음악파일을 다운받아서 넣던가, href줘서 외부주소를 연결해줘야함-->
+  <audio data-key="65" src="#"></audio>
+  <audio data-key="83" src="#"></audio>
+  <audio data-key="68" src="#"></audio>
+  <audio data-key="70" src="#"></audio>
+  <audio data-key="71" src="#"></audio>
+  <audio data-key="72" src="#"></audio>
+  <audio data-key="74" src="#"></audio>
+  <audio data-key="75" src="#"></audio>
+  <audio data-key="76" src="#"></audio>
+  <audio data-key="186" src="#"></audio>
+  <audio data-key="222" src="#"></audio>
+</body>
+<script>
+  playSound = e => { //생소하게 보일수도 있으나 화살표 함수 es6문법 (키가 눌렸을때 함수)
+    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`); //소리
+    const key = document.querySelector(`li[data-key="${e.keyCode}"]`); //키
+    
+    if (audio) { //오디오라면
+      audio.currentTime = 0; //이전 오디오가 끝나지 않으면 새로운 오디오가 재생되지 않는것을 처리하는것      
+      audio.play(); // 오디오를 출력한다.
+      key.classList.add("playing"); //key의 새로운 클래스를 추가한다.
+      //이유는 눌렀을때 css가 눌린 디자인을 보여주기위함. 
+    }
+  };
+
+  removeTransition = e => { // (키를 뗐을때 함수)
+    if (e.propertyName === "transform") { //e의 속성이 트랜스폼과 같다면
+      e.target.classList.remove("playing"); // 눌린 디자인을 제거해준다. 원복느낌css을 주기위함
+    }
+  };
+
+  window.addEventListener("keydown", playSound); // 함수 키가눌렸을때 playsound
+
+  const pianoElList = document.querySelectorAll("li"); // li속성을 가진 리스트들을 정의
+
+  pianoElList.forEach(el => { // 키가눌려 css의 트랜지션 효과가 생길때 
+    el.addEventListener("transitionend", removeTransition); // transition상태가 되면 removeTransition 함수를 실행시켜라.
+
+  });
+</script>
+
+</html>

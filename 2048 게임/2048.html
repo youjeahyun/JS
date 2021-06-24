@@ -1,0 +1,242 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>2048</title>
+
+<style>
+  #table { border-collapse: collapse; user-select: none; }
+  #table td {
+    border: 10px solid #bbada0; width: 116px; height: 128px;
+    font-size: 50px; font-weight: bold; text-align: center;
+  }
+  #score { user-select: none; }
+  .color-2 { background-color: #eee4da; color: #776e65;}
+  .color-4 { background-color: #eee1c9; color: #776e65;}
+  .color-8 { background-color: #f3b27a; color: 'white';}
+  .color-16 { background-color: #f69664; color: 'white';}
+  .color-32 { background-color: #f77c5f; color: 'white';}
+  .color-64 { background-color: #f75f3b; color: 'white';}
+  .color-128 { background-color: #edd073; color: #776e65;}
+  .color-256 { background-color: #edcc62; color: #776e65;}
+  .color-512 { background-color: #edc950; color: #776e65;}
+  .color-1024 { background-color: #edc53f; color: #776e65;}
+  .color-2048 { background-color: #edc22e; color: #776e65;}
+</style>
+</head>
+<body>
+<table id="table"></table>
+<div id="score">0</div>
+
+
+<script>
+  const $table = document.getElementById('table');
+  const $score = document.getElementById('score');
+  let data = [];
+
+  // $table -> $fragment -> $tr -> $td
+  function startGame() { // 게임시작시 호출되는 함수 4*4표를 그린다.
+     //DocumentFragment는 다른 노드를 담는 임시 컨테이너 역할을 하는 특수 목적의 노드이다. 
+    //가상의 노드 객체로서, 메모리상에서만 존재하는 비 문서 탬플릿
+    const $fragment = document.createDocumentFragment();
+   
+    [1, 2, 3, 4].forEach(function () { //4*4 앞숫자의 열과행
+      const rowData = []; // 빈배열을 rowData 상수로 지정한다.
+      data.push(rowData);//push 메서드 : 배열의 마지막에 새로운 요소를 추가한 후, 변경된 배열의 길이를 반환
+      const $tr = document.createElement('tr'); //tr요소를 만든다 
+      [1, 2, 3, 4].forEach(() => { // 4*4 앞숫자에 따른 뒤숫자의 열과행 구구단같은느낌
+        rowData.push(0); // push 메서드 : 배열의 마지막에 새로운 요소를 추가한 후, 변경된 배열의 길이를 반환
+        const $td = document.createElement('td'); //td요소를 만든다.
+        $tr.appendChild($td); // tr 내에 td를 넣는다.
+      });
+      $fragment.appendChild($tr); //fragment(가상의 노드객체) 내에 tr을 넣는다.
+    });
+    $table.appendChild($fragment);//테이블내에 가상의 노드객체를 넣는다.
+    put2ToRandomCell(); //빈칸을찾아 숫자2를 넣는함수를 실행한다.
+    draw(); // 화면을 그린다. 칸에 텍스트와 클래스를 해당 draw 함수를 통해 넣는다.
+  }
+
+  function put2ToRandomCell() {  // 함수에서 빈칸을 모두 찾은뒤, 무작위로 칸을선택해 숫자2를 넣는함수.
+    const emptyCells = []; // [[i1, j1], [i2, j2], [i3, j3]]
+    data.forEach(function (rowData, i) { //rowData 몇번쨰줄(index)
+      rowData.forEach(function (cellData, j) { //cellData 몇번째칸(index)
+        if (!cellData) { //
+          emptyCells.push([i, j]); //빈칸들이 몇번째줄 몇번쨰칸인지 상수 emptyCells에 넣어둔다.
+        }
+      });
+    });
+    // randomCell === [i, j] 배열이 2개니까 배열0과 배열1
+    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    //랜덤하게 한판 뽑아서
+    data[randomCell[0]][randomCell[1]] = 2;
+    //칸에2를넣어라
+  }
+
+  function draw() {  // 화면을 그리는 함수
+    data.forEach((rowData, i) => { //rowData 몇번쨰줄(index)
+      rowData.forEach((cellData, j) => { //cellData 몇번째칸(index)
+        const $target = $table.children[i].children[j]; //table의 children[i] tr이고 childeren[j]는 td이다.
+        if (cellData > 0) { 
+          $target.textContent = cellData; //숫자텍스트는 셀안에 넣어주고
+          $target.className = 'color-' + cellData; //클래스이름은 -coolor-(숫자텍스트)로준다. css주기위함. 맨위 정의해놓음
+        } else {
+          $target.textContent = ''; //셀데이터가 0이면 공백으로 주어서 빈칸으로 보이게한다
+          $target.className = ''; //셀데이터가 0이면 공백으로 주어서 빈칸으로 보이게한다
+        }
+      });
+    });
+  }
+
+  startGame();
+
+   function moveCells(direction) {
+    switch (direction) {
+      case 'left': {
+        const newData = [[], [], [], []]; // 새로운데이타
+        data.forEach((rowData, i) => {
+          rowData.forEach((cellData, j) => {
+            if (cellData) {
+              const currentRow = newData[i] // 지금줄 newData는 데이터에 이동하기전에 계산을위한
+              const prevData = currentRow[currentRow.length - 1];//뉴데이터에서 이전값은 배열 들어가기전의 숫자기 때문에 -1
+              if (prevData === cellData) { // 이전 값과 지금 값이 같으면
+                const score = parseInt($score.textContent);
+                $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                currentRow[currentRow.length - 1] *= -2; //*2로하면 뒤에 같은 숫자가 있다고하면 연달아서 합쳐지기때문에
+                //음수로 지정해주기위해서 *2를함 그리고 밑에 절대값으로 해서 음수를 절대값으로바꿔줌.
+              } else {
+                newData[i].push(cellData); // 빈칸제외하고 왼쪽으로 넣어준다.
+              }
+            }
+          });
+        });
+        console.log(newData);
+        [1, 2, 3, 4].forEach((rowData, i) => {
+          [1, 2, 3, 4].forEach((cellData, j) => {
+            data[i][j] = Math.abs(newData[i][j]) || 0; // 원본데이터수정 음수를 절대값으로 바꿔줌
+          });
+        });
+        break;
+      }
+      case 'right': {
+        const newData = [[], [], [], []];
+        data.forEach((rowData, i) => {
+          rowData.forEach((cellData, j) => {
+            if (rowData[3 - j]) { //오른쪽은 왼쪽과 반대기 떄문에 3,2,1,0 식으로 해야 오른쪽 
+              const currentRow = newData[i]
+              const prevData = currentRow[currentRow.length - 1];
+              if (prevData === rowData[3 - j]) {
+                const score = parseInt($score.textContent);
+                $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                currentRow[currentRow.length - 1] *= -2;
+              } else {
+                newData[i].push(rowData[3 - j]);
+              }
+            }
+          });
+        });
+        console.log(newData);
+        [1, 2, 3, 4].forEach((rowData, i) => {
+          [1, 2, 3, 4].forEach((cellData, j) => {
+            data[i][3 - j] = Math.abs(newData[i][j]) || 0;
+          });
+        });
+        break;
+      }
+      case 'up': {
+        const newData = [[], [], [], []];
+        data.forEach((rowData, i) => {
+          rowData.forEach((cellData, j) => {
+            if (cellData) {
+              const currentRow = newData[j]
+              const prevData = currentRow[currentRow.length - 1];
+              if (prevData === cellData) {
+                const score = parseInt($score.textContent);
+                $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                currentRow[currentRow.length - 1] *= -2;
+              } else {
+                newData[j].push(cellData);
+              }
+            }
+          });
+        });
+        console.log(newData);
+        [1, 2, 3, 4].forEach((cellData, i) => {
+          [1, 2, 3, 4].forEach((rowData, j) => {
+            data[j][i] = Math.abs(newData[i][j]) || 0;
+          });
+        });
+        break;
+      }
+      case 'down': {
+        const newData = [[], [], [], []];
+        data.forEach((rowData, i) => {
+          rowData.forEach((cellData, j) => {
+            if (data[3 - i][j]) {
+              const currentRow = newData[j];
+              const prevData = currentRow[currentRow.length - 1];
+              if (prevData === data[3 - i][j]) {
+                const score = parseInt($score.textContent);
+                $score.textContent = score + currentRow[currentRow.length - 1] * 2;
+                currentRow[currentRow.length - 1] *= -2;
+              } else {
+                newData[j].push(data[3 - i][j]);
+              }
+            }
+          });
+        });
+        console.log(newData);
+        [1, 2, 3, 4].forEach((cellData, i) => {
+          [1, 2, 3, 4].forEach((rowData, j) => {
+            data[3 - j][i] = Math.abs(newData[i][j]) || 0;
+          });
+        });
+        break;
+      }
+    }
+    if (data.flat().includes(2048)) { // 승리
+      draw();
+      setTimeout(() => {
+        alert('축하합니다. 2048을 만들었습니다!');  
+      }, 0);
+    } else if (!data.flat().includes(0)) { // 빈 칸이 없으면 패배
+      alert(`패배했습니다... ${$score.textContent}점`);
+    } else {
+      put2ToRandomCell(); //어느한쪽으로 쏠리게하기 1장에서 정의한 함수
+      draw(); //그리기 1장에서 정의한 함수
+    }
+  }
+
+window.addEventListener('keyup', (event) => { //키보드를 뗀순간
+  if (event.key === 'ArrowUp') { //화살표 위 
+    moveCells('up');
+  } else if (event.key === 'ArrowDown') { //화살표  아래
+    moveCells('down');
+  } else if (event.key === 'ArrowLeft') { //화살표 왼쪽
+    moveCells('left');
+  } else if (event.key === 'ArrowRight') { //화살표 오른쪽
+    moveCells('right');
+  }
+});
+
+
+  let startCoord; 
+  
+  window.addEventListener('mousedown', (event) => {
+    startCoord = [event.clientX, event.clientY]; //startCoord에다가 마우스 첫좌표를 기록 드래그위해서
+  });
+  window.addEventListener('mouseup', (event) => {
+    const endCoord = [event.clientX, event.clientY]; // endCoord에다가 마우스 뗄때 끝좌표 기록 드래그위해서
+    const diffX = endCoord[0] - startCoord[0]; // 끝좌표와 첫좌표 차를 구해서 x의좌표를 구함
+    const diffY = endCoord[1] - startCoord[1]; // 끝좌표 첫좌표 차를 구해서 y의좌표를 구함
+    if (diffX < 0 && Math.abs(diffX) > Math.abs(diffY)) {
+      moveCells('left');  // 좌 수학공부..(절대값)
+    } else if (diffX > 0 && Math.abs(diffX) > Math.abs(diffY)) {
+      moveCells('right'); // 우 수학공부..(절대값)
+    } else if (diffY > 0 && Math.abs(diffX) <= Math.abs(diffY)) {
+      moveCells('down');// 하 수학공부..(절대값)
+    } else if (diffY < 0 && Math.abs(diffX) <= Math.abs(diffY)) {
+      moveCells('up'); //상 수학공부..(절대값)
+    } 
+  });
+</script>
+</body>
+</html>

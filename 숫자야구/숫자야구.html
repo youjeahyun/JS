@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숫자야구</title>
+</head>
+
+<body>
+    <h1>숫자 야구 게임 </h1>
+    <form id="form">
+        <input type="text" id="input">
+        <button>확인</button>
+    </form>
+    <div id="logs"></div>
+    <script>
+        const $input = document.querySelector('#input');
+        const $form = document.querySelector('#form');
+        const $logs = document.querySelector('#logs');
+
+        const numbers = []; // 9개의 정수
+        for (let n = 0; n < 9; n++) { //9번반복
+            numbers.push(n + 1);
+        }
+
+
+        const answer = [] //정답
+        for (let n = 0; n < 4; n++) { //4번 반복
+            const index = Math.floor(Math.random() * numbers.length); // [0,1,2,3,4,~,9] 에서허 하나를 뽑는다.
+            answer.push(numbers[index]); // numbers에있는 배열에 뽑힌 index를 answer에 넣어준다.
+            numbers.splice(index, 1); //number배열에서 뽑힌 index번쨰의 숫자를 하나 빼준다.
+            console.log(answer.join('')); //이건 내가 정답을 확인하려고,, 넣어둔 콘솔로그
+        }
+
+        const tries = [];
+        function checkInput(input) { // 검사하는 코드
+            if (input.length !== 4) {// 길이는 4가 아닌가
+                return alert('4자리 숫자로 입력해 주세요');
+            }
+            if (new Set(input).size !== 4) { //중복된 숫자가 있는가 알아서 배열을 제거해주는 배열이 new set() length대신 size를 사용
+                return alert('중복되지 않게 입력해 주세요');
+            }
+            if (tries.includes(input)) { //이미 시도한 값은 아닌가
+                return alert('이미 시도한 값입니다');
+            }
+            return true;
+        }
+
+
+
+
+        $form.addEventListener('submit', (event) => {
+            event.preventDefault(); // 기본동작막기 (form의 새로고침)
+            const value = $input.value; // 입력한 값을 value변수에 저장한다.
+            $input.value = ''; // 입력창 초기화
+            if (!checkInput(value)) { // 문제 있을떄
+                return;
+            }
+            // 입력값 문제없음.
+            if (answer.join('') === value) { // 배열을 문자열로 바꿔주는 메서드 join() ()에는 요소들사이에 들어갈 문자나 숫자넣어야함 기본은 ,여서 ''공백줌
+                $logs.textContent = '홈런!'; // logs에 홈런을 적어준다
+                return;
+            }
+            if (tries.length >= 9) { //10번시도 10번 실패하면 패배
+                const message = document.createTextNode(`패배! 정답은 ${answer.join('')}`);
+                $logs.appendChild(message); // logs에 message 를 넣어준다. 위의 문구
+                return;
+            }
+            //몇 스크라이크 몇볼인지 검사
+            let strike = 0;
+            let ball = 0;
+
+            for (let i = 0; i < answer.length; i++) { // 정답과 비교하는 반복문
+                const index = value.indexOf(answer[i]); // 겹치는게있나 확인하는 과정 indexOf
+                if (index > -1) { //일치하는 숫자 발견했을시
+                    if (index === i) {// 자릿수도 일치 하는가? 
+                        strike += 1; // 같으면 스트라이크 누적
+                    } else { //숫자만 같으면
+                        ball += 1;  //볼로 누적을
+                    } 
+                }
+            }
+            $logs.append(`${value}       :★${strike}스트라이크 ${ball}볼`, document.createElement('br')); // $logs에 정답시도시 나오는 문구출력
+            tries.push(value); // value를 tries에 넣어줘서 다음회차부터는 value를 검사하는 함수를 실행시키기위함
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"> 
+    <meta name="viewprot" content="width=devie-width, inital-scale=1.0">
+    <!--viewport의 width를 디바이스에 맞추고 초기 배율을 1.0으로 지정했으며, 다른설정은 지정하지 않는다-->
+    <meta http-equi="X-UA-Compatible" content="ie=edge">
+    <!--X-UA-Compatible 태그로 웹의 호환성을 지정, 
+    edge라고 기록된건 IE 브라우저의 최신 버전의 엔진을 사용-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <!--부트스트랩 링크사용 style -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>날씨 정보 앱</title>
+</head>
+
+<body>
+    <div class="container w-75 mt-5 p-5 shadow text-center bg-warning text-dark">
+      <H2>대한민국 서울의 날씨</H2>
+      <hr>
+      <div class="row bg-success p-5 rounded-circle">
+        <div class="col-5">
+          <img id="icon">
+        </div>
+        <div class="col-7 m-auto">
+          <h1 class="display-3" id="temp"></h1>
+          <strong id="weather"></strong><br> 
+          최저온도: <span id="min"></span>°C<br> 최고온도: <span id="max"></span>°C<br> 
+          바람: <span id="wind"></span>m/s
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    let temp = document.querySelector('#temp');
+    let min = document.querySelector('#min');
+    let max = document.querySelector('#max');
+    let wind = document.querySelector('#wind');
+    let weather = document.querySelector('#weather');
+    let icon = document.querySelector("#icon");
+    let icon_url = "https://openweathermap.org/themes/openweathermap/assets/vendor/owm/img/widgets/";
+
+    axios.get('https://api.openweathermap.org/data/2.5/find?q=Seoul&units=metric&appid=7d96bc5108f52b80e2d9075a369b9f35')
+      .then(function(response) {
+        console.log(response.data);
+        let wdata = response.data.list[0];
+        let exdata = response.data.list[0].weather[0];
+
+        temp.innerText = wdata.main.temp + "°C"; 
+        min.innerText = wdata.main.temp_min;
+        max.innerText = wdata.main.temp_max;
+        wind.innerText = wdata.wind.speed;
+
+        weather.innerText = exdata.main + "," + exdata.description;
+        icon.setAttribute('src', icon_url + exdata.icon + ".png");
+      })
+      .catch(function(error) {
+        console.log(error);
+      })
+      .then(function() {});
+</script>
+</html>

@@ -1,0 +1,82 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="kr" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>TO DO LIST</title>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Nanum+Brush+Script&display=swap");
+      
+        body {
+          font-family: 'Nanum Brush Script', cursive; 
+       
+          
+        }
+
+        input, button {
+            border-radius: 15px;
+            border-color: grey;
+      
+        }
+
+      
+        h1 {
+            color : red;
+        }
+
+
+        ul {
+            list-style: none;
+            text-align: left;
+            padding-left: 0px;
+        }
+    </style>
+  
+</head> 
+
+<body>
+
+ 
+        <h1>TODO PROJECT</h1>
+        <input type="text" id="input">
+        <button type="button" id="button">입력</button>
+      
+            <ul id="list">
+                
+            </ul>
+
+
+
+    <script>
+        let button = document.getElementById('button'); //id가 button인것을 통해서 객체 button 만듬
+        let input = document.getElementById('input'); //id가 input인것을 통해서 객체 input 만듬
+        let list = document.getElementById('list'); //id가 list인것을 통해서 객체 list 만듬
+        
+        var cut = 0; // 일정이생기면 0부터 시작하니까 0으로 정의 객체명은 cut으로 지정한다.
+
+        function clickButton() { // 함수 clickButton의 행동을 정읭해줌
+            let temp = document.createElement('li'); // 리스트인 li을 생성하는 메서드를 temp에 정의
+          
+            temp.setAttribute('id', 'li'+cut); 
+          
+            temp.innerHTML = input.value; // innerHTML은 요소 내에 포함된 HTML XML 마크업을 가져오거나 설정함.
+            temp.innerHTML +=  "<button type='button' onclick='remove("+cut+")'>삭제</button>"; 
+            //input이 생성될떄 같이 버튼을 만든다. 그리고 만드는 버튼에서 클릭을하게되면 remove(cut) 함수를 실행한다.
+           
+            list.appendChild(temp); // id list인 ul태그에 자식 li를 를 추가한다. 
+            // appendChild 한번에 하나만가능. append는 여러개가가능함.
+            
+        }
+        function remove(cut) {
+            var li = document.getElementById('li'+cut);
+            list.removeChild(li);
+            }
+
+        button.addEventListener('click', clickButton); // 버튼.이벤트를준다(클릭시, clickButton 이란 함수를)
+        
+        
+     
+    </script>
+</body>
