@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>틱택토</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            border: 1px solid black;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!--스크립트로 표를 그려줄거기때문에 html은 작성안함-->
+    <!--테이블의 기본 구조-->
+    <!-- <table>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </table> -->
+    <script>
+        const { body } = document; // = const body = document.body 랑 같은 구조분해 할당 문법
+
+        const $table = document.createElement('table');
+        const $result = document.createElement('div');
+        const rows = []; //2차원 배열 변수
+        let turn = 'O';
+
+        for (let i = 1; i <= 3; i++) { // 줄 그리기 
+            const $tr = document.createElement('tr');
+            const cells = []; // 2차원 배열 변수
+            for (let j = 1; j <= 3; j++) { //칸그리기
+                const $td = document.createElement('td'); 
+                cells.push($td); //cells에 $td를 넣어줌
+                $tr.append($td); // tr에 $td를 넣어줌
+            }
+            rows.push(cells); // cells 배열을 rosw배열에 넣어줌 2차원배열
+            $table.append($tr); // tr을 table에 넣어줌
+        }
+           
+        
+     
+
+        const callback = (event) => { //callback 함수 이벤트
+            if (event.target.textContent !== '') { // 칸이 이미 채워져 있는가?
+                console.log('빈칸이 아닙니다.'); // 
+                return; // return 반환하여 종료
+            }
+            // 빈칸이면
+            console.log('빈칸입니다');
+            event.target.textContent = turn; // trun은 'O'임 칸에 O이 채워져있으면
+            // 승부 판단하기
+            const hasWinner = checkWinner(event.target);
+            if (hasWinner) {
+                $result.textContent = `${turn}님이 승리!`;
+                $table.removeEventListener('click', callback);
+                return;
+            }
+            // 무승부 검사
+            const draw = rows.flat().every((cell) => cell.textContent); //2차원 배열 rows를 flat을 사용해서 1차원배열로바꾼뒤 every메서드를 사용해 cell이
+            //모두 차있을때만 무승부이게끔 한다.
+            if (draw) {
+                $result.textContent = `무승부`;
+                return;
+            }
+            turn = (turn === 'X' ? 'O' : 'X'); // 턴이 O면 X로바꾸고 X면 O로 바꿔라
+        };
+        body.append($table); // body 내에 #table을 넣음
+        body.append($result); // body 내에 #result을 넣음
+        $table.addEventListener('click', callback); // callback 함수 클릭시 이벤트 이벤트버블링 (TD클릭하면 BODY까지 클릭됨 거품올라가듯이 부모한테올라감)
+
+        const checkWinner = (target) => { // td 9개중 하나
+            const rowIndex = target.parentNode.rowIndex; // rowIndex는 부모태그라 parentNode를 적어서 가져온다.
+            const cellIndex = target.cellIndex; //td는 cell이라 몇번쨰칸인줄 알고있다 
+
+            // 세 칸 다 채워졌나?
+            let hasWinner = false; // true가 되면 승부가남
+        /* [ 
+            [td, td, td]
+            [td, td, td]
+            [td, td, td]    
+        ]*/
+            
+            // 가로줄 검사
+            if (
+                rows[rowIndex][0].textContent === turn &&
+                rows[rowIndex][1].textContent === turn &&
+                rows[rowIndex][2].textContent === turn
+            ) {
+                hasWinner = true;
+            }
+            // 세로줄 검사
+            if (
+                rows[0][cellIndex].textContent === turn &&
+                rows[1][cellIndex].textContent === turn &&
+                rows[2][cellIndex].textContent === turn
+            ) {
+                hasWinner = true;
+            }
+            // 대각선 검사
+            if (
+                rows[0][0].textContent === turn &&
+                rows[1][1].textContent === turn &&
+                rows[2][2].textContent === turn
+            ) {
+                hasWinner = true;
+            }
+            if (
+                rows[0][2].textContent === turn &&
+                rows[1][1].textContent === turn &&
+                rows[2][0].textContent === turn
+            ) {
+                hasWinner = true;
+            }
+            return hasWinner;
+        };
+
+
+       
+
+       
+    </script>
+</body>
+
+</html>

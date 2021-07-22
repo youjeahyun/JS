@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>반응속도</title>
+    <style>
+        #screen {
+            width: 300px;
+            height: 200px;
+            text-align: center;
+            user-select: none;
+        }
+
+        #screen.waiting {
+            background-color: aqua;
+        }
+
+        #screen.ready {
+            background-color: red;
+            color: white;
+        }
+
+        #screen.now {
+            background-color: greenyellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="screen" class="waiting">클릭해서 시작하세요</div>
+    <div id="result"></div>
+    <!--평균반응속도 보여주는곳-->
+    <script>
+        const $screen = document.querySelector('#screen');
+        const $result = document.querySelector('#result');
+
+        let startTime; // 첫시간
+        let endTime; // 끝시간
+        const records = []; // 기록
+        let timeoutId; 
+
+        $screen.addEventListener('click', (event) => {
+            if (event.target.classList.contains('waiting')) {// 파랑색일 때 클릭 이벤트
+                $screen.classList.remove('waiting');  //waiting 클래스 제거
+                $screen.classList.add('ready'); //ready 클래스 추가
+                $screen.textContent = '초록색이 되면 클릭하세요' // ready클래스 추가 후 텍스트 추가
+                timeoutId = setTimeout(() => { //타이머 함수 실행후; 
+                    startTime = new Date()//시간을 재준다 첫시간
+                    $screen.classList.replace('ready', 'now'); // ready 클래스 를 now 클래스로 교체
+                    $screen.textContent = '클릭하세요!'; // now클래스 추가후 텍스트 추가
+                }, Math.floor(Math.random() * 1000) + 4000); //시간재기 타이머는 2초에서 5초사이에 랜덤실행
+            } else if (event.target.classList.contains('ready')) { // 빨강
+                clearTimeout(timeoutId); // 타이머를 지운다
+                $screen.classList.remove('ready'); 
+                $screen.classList.add('waiting');
+                $screen.textContent = '실패! 다시진행하시려면 클릭하세요';
+                
+
+            } else if (event.target.classList.contains('now')) { //초록
+                endTime = new Date();
+                const current = endTime - startTime; // 시간차이를 current에 넣고
+                records.push(current); // current를 records에 배열에 모아둠
+                const average = records.reduce( (a, c) => (a + c), 0) / records.length; // 평균구하기 a는 누적값, c는 현재값 , 초기값 0
+                //reduce는 리턴값 체크 초기화값 체크 필수
+                $result.textContent = `현재 ${current}ms, 평균: ${average}ms`; // 템플릿문자로 평균을 출력
+                startTime = null; // 초기화해주기
+                endTime = null; // 초기화해주기
+
+                $screen.classList.remove('now'); // now클래스르 지운다
+                $screen.classList.add('waiting'); // waiting 클래스를 생성해준다
+                $screen.textContent = '클릭해서 시작하세요'; // waiting 클래스 추가후 텍스트 추가
+             
+            }
+        }
+        );
+    </script>
+</body>
+
+</html>

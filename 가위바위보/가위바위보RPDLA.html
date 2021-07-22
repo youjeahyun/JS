@@ -1,0 +1,112 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>가위바위보</title>
+    <style>
+        #computer {
+            width: 142px;
+            height: 200px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="computer"></div>
+    <!--컴퓨터 손 이미지 들어갈예정-->
+    <div>
+        <button id="scissors" class="btn">가위</button>
+        <button id="rock" class="btn">바위</button>
+        <button id="paper" class="btn">보</button>
+    </div>
+    <div id="score"></div>
+
+    <script>
+        const $computer = document.querySelector('#computer');
+        const $score = document.querySelector('#score');
+        const $rock = document.querySelector('#rock');
+        const $scissors = document.querySelector('#scissors');
+        const $paper = document.querySelector('#paper');
+
+        const IMG_URL = './rsp.png'; // 현재 폴더를 지칭할때 ./ 부모 ../
+        $computer.style.background = `url(${IMG_URL}) 0px 0`; // CSS수정해주는 메서드
+        $computer.style.backgroundSize = 'auto 200px'; // CSS수정해주는 메서드
+
+
+        const rspX = {
+            scissors: '0', //가위
+            rock: '-230px', //바위
+            paper: '-440px'//보
+        }
+
+        let computerChoice = 'scissors'; // 컴퓨터의 가위바위보
+        const changeComputerHand = () => {
+            if (computerChoice === 'scissors') { //가위면 바위로 바꾼다
+                computerChoice = 'rock'
+            } else if (computerChoice === 'rock') { // 바위면 보로 바꾼다.
+                computerChoice = 'paper'
+            } else if (computerChoice === 'paper') { // 보면 가위로 바꾼다.
+                computerChoice = 'scissors'
+            } //rspX. <- 점을 찍으면안된다 값자리라서 그래서 점찍으면 문자열을 찾기때문에 배열로 [] 해야함.
+            $computer.style.background = `url(${IMG_URL}) ${rspX[computerChoice]} 0`; // CSS수정해주는 메서드
+            $computer.style.backgroundSize = 'auto 200px'; // CSS수정해주는 메서드
+
+        }
+        let intervalId = setInterval(changeComputerHand, 50);
+
+        const scoreTable = { // 점수표 
+            rock: 0,
+            scissors: 1,
+            paper: -1,
+        };
+
+
+        // clickButton 5번 호출, 인터벌 1번, 2번, 3번, 4번, 5번(얘만 intervalId)
+        //  그 다음에 버튼을 클릭하면 5번만 취소
+        let clickable = true;
+        let score = 0;
+        const clickButton = () => { //타이머 만들때마다 변수에 저장해서    
+            if (clickable) {
+                clearInterval(intervalId);
+                clickable = false;
+
+                //점수 계산 및 화면 표시
+                const myChoice = event.target.textContent == '바위' // 이벤트 tenxContent가 바위면
+                    ? 'rock' // rock으로
+                    : event.target.textContent === '가위' // 이벤트 tenxContent가 가위면
+                        ? 'scissors'  // scissors로
+                        : 'paper'//아니면 paper로
+                const myScore = scoreTable[myChoice]; // 내가몇점인지?
+                const computerScore = scoreTable[computerChoice]; // 상대가 몇점인지?
+                const diff = myScore - computerScore; // 차를 구하면 점수표 조건
+
+                let message;
+                // 2, -1은 승리조건이고, -2, 1은 패배조건, 점수표 참고
+                if ([2, -1].includes(diff)) {
+                    score += 1;
+                    message = '승리';
+                } else if ([-2, 1].includes(diff)) {
+                    score -= 1;
+                    message = '패배';
+                } else {
+                    message = '무승부';
+                }
+
+                $score.textContent = `${message} 총: ${score}점`;
+                setTimeout(() => {
+                    clickable = true;
+                    intervalId = setInterval(changeComputerHand, 50);
+                }, 1000);
+            }
+        };
+
+        $rock.addEventListener('click', clickButton);
+        $scissors.addEventListener('click', clickButton);
+        $paper.addEventListener('click', clickButton);
+
+    </script>
+</body>
+
+
+</html>
